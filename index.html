@@ -1,0 +1,1844 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>واسطتك | WASTATAK — منصة إثبات الكفاءة بالذكاء الاصطناعي والخبراء البشريين</title>
+  <meta name="description" content="كفاءتك هي واسطتك الحقيقية. المنصة الأولى بالشرق الأوسط لاستبدال السير الذاتية بمشروعات واقعية تحاكي أول 90 يوماً في الوظيفة، مدعومة بالذكاء الاصطناعي والمستشارين البشريين.">
+
+  <!-- Fonts: Cairo (Arabic Executive) + Plus Jakarta Sans (English Luxury) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Three.js + OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  
+  <!-- GSAP for Smooth Transitions -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #090e17;
+      --bg-surface: #0e1626;
+      --bg-surface-elevated: #141f36;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(16, 185, 129, 0.4);
+      --primary: #10b981; /* Shark Tank Venture Emerald */
+      --primary-glow: rgba(16, 185, 129, 0.25);
+      --secondary: #2563eb; /* Institutional Royal Blue */
+      --accent: #f59e0b; /* Executive Gold */
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 22px;
+      --font-ar: 'Cairo', sans-serif;
+      --font-en: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-ar);
+      line-height: 1.6;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient Lighting */
+    .ambient-glow-1 {
+      position: fixed;
+      top: -100px;
+      right: 20%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .ambient-glow-2 {
+      position: fixed;
+      top: 40%;
+      left: -100px;
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(37, 99, 235, 0.1) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Navigation Bar */
+    header.shark-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(9, 14, 23, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+    }
+
+    .brand-logo-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 900;
+      font-size: 20px;
+      box-shadow: 0 0 20px var(--primary-glow);
+    }
+
+    .brand-name {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-tagline-micro {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      list-style: none;
+    }
+
+    .nav-link-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font-ar);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+    }
+    .nav-link-btn:hover, .nav-link-btn.active {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .nav-link-btn.active {
+      color: var(--primary);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-ar);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid transparent;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(16, 185, 129, 0.35);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(16, 185, 129, 0.5);
+    }
+
+    .btn-shark-pitch {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(245, 158, 11, 0.35);
+    }
+    .btn-shark-pitch:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 26px rgba(245, 158, 11, 0.5);
+    }
+
+    .btn-consult {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(37, 99, 235, 0.35);
+    }
+    .btn-consult:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(37, 99, 235, 0.5);
+    }
+
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Hero Section */
+    section.hero-section {
+      min-height: 95vh;
+      display: flex;
+      align-items: center;
+      padding-top: 100px;
+      position: relative;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 40px;
+      align-items: center;
+      width: 100%;
+    }
+
+    .hero-badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 99px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+
+    .hero-title {
+      font-size: clamp(38px, 5.2vw, 62px);
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -1px;
+      margin-bottom: 20px;
+    }
+    .hero-title span.highlight-green {
+      background: linear-gradient(135deg, #10b981, #34d399);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 18px;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 32px;
+      max-width: 620px;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+
+    /* Trust Metrics Row */
+    .hero-metrics-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      border-top: 1px solid var(--border);
+      padding-top: 28px;
+    }
+
+    .metric-item .val {
+      font-size: 28px;
+      font-weight: 900;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+    .metric-item .val .unit {
+      color: var(--primary);
+      font-size: 20px;
+    }
+    .metric-item .lbl {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* 3D Model Stage */
+    .hero-3d-stage {
+      position: relative;
+      height: 520px;
+      border-radius: var(--radius-lg);
+      background: radial-gradient(circle at 50% 50%, rgba(20, 31, 54, 0.6) 0%, rgba(9, 14, 23, 0.4) 100%);
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+    }
+
+    #hero-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .stage-hud-overlay {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    .stage-tag {
+      background: rgba(14, 22, 38, 0.8);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 99px;
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .stage-tag .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 8px var(--primary);
+    }
+
+    /* Sections */
+    section.content-section {
+      padding: 90px 0;
+      position: relative;
+    }
+
+    .section-head {
+      text-align: center;
+      max-width: 720px;
+      margin: 0 auto 50px;
+    }
+    .section-tag {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .section-title {
+      font-size: 36px;
+      font-weight: 900;
+      line-height: 1.25;
+      margin-bottom: 12px;
+    }
+    .section-desc {
+      color: var(--text-muted);
+      font-size: 16px;
+    }
+
+    /* Executive Cards */
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 28px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+    .card:hover {
+      background: var(--bg-surface-elevated);
+      border-color: var(--border-focus);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    /* 4 Pillars Grid */
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .pillar-card {
+      display: flex;
+      flex-direction: column;
+    }
+    .pillar-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+    }
+    .pillar-card h3 {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+    .pillar-card p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .pillar-points {
+      list-style: none;
+      margin-top: auto;
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+    }
+    .pillar-points li {
+      font-size: 12px;
+      color: #cbd5e1;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .pillar-points li i {
+      color: var(--primary);
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+      margin-top: 3px;
+    }
+
+    /* UPDATED ROI CALCULATOR (No Platform Pricing) */
+    .roi-container {
+      background: linear-gradient(145deg, #0f182a, #0a1120);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: var(--radius-lg);
+      padding: 44px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 30px rgba(16, 185, 129, 0.1);
+    }
+
+    .roi-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .roi-slider-group {
+      margin: 28px 0;
+    }
+    .roi-slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .roi-slider-header label {
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .roi-slider-val {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--primary);
+    }
+    .roi-range-input {
+      width: 100%;
+      height: 8px;
+      border-radius: 99px;
+      background: #1e293b;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    .roi-range-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: 0 0 14px var(--primary);
+    }
+
+    .roi-stat-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 18px;
+    }
+    .roi-stat-box .lbl {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .roi-stat-box .amt {
+      font-size: 28px;
+      font-weight: 900;
+      color: #fff;
+    }
+
+    .roi-highlight-card {
+      background: rgba(16, 185, 129, 0.06);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: var(--radius-md);
+      padding: 32px;
+      text-align: center;
+    }
+
+    /* Human Advisors Grid */
+    .human-experts-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .expert-card {
+      text-align: center;
+      padding: 32px 24px;
+    }
+    .expert-photo {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      background: linear-gradient(135deg, #2563eb, #10b981);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      border: 3px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 20px rgba(37, 99, 235, 0.3);
+    }
+
+    /* Consultation Booking Modal */
+    .consult-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 7, 13, 0.94);
+      backdrop-filter: blur(28px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .consult-modal.active {
+      display: flex;
+    }
+    .consult-dialog {
+      background: #0d1525;
+      border: 1px solid rgba(37, 99, 235, 0.4);
+      max-width: 600px;
+      width: 100%;
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      position: relative;
+      box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.9), 0 0 40px rgba(37, 99, 235, 0.2);
+    }
+
+    .form-control {
+      margin-bottom: 18px;
+    }
+    .form-control label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+    }
+    .form-control input, .form-control select, .form-control textarea {
+      width: 100%;
+      background: #060a12;
+      border: 1px solid var(--border);
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      color: #fff;
+      font-family: var(--font-ar);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-control input:focus, .form-control select:focus, .form-control textarea:focus {
+      border-color: var(--secondary);
+    }
+
+    /* Simulations Grid */
+    .simulations-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 24px;
+    }
+
+    .sim-card {
+      display: flex;
+      flex-direction: column;
+    }
+    .sim-badge-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .sim-track-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 99px;
+      background: rgba(37, 99, 235, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(37, 99, 235, 0.3);
+    }
+    .sim-time-badge {
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* AI Workforce */
+    .ai-workforce-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    .ai-agent-card {
+      text-align: center;
+      padding: 30px 20px;
+      cursor: pointer;
+    }
+    .agent-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border: 2px solid var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+    }
+
+    /* Interactive AI Chat Box */
+    .chat-box-card {
+      background: #060910;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      margin-top: 30px;
+    }
+    .chat-messages {
+      height: 180px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding: 10px;
+    }
+    .chat-msg {
+      max-width: 80%;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .chat-msg.agent {
+      align-self: flex-start;
+      background: rgba(37, 99, 235, 0.15);
+      border: 1px solid rgba(37, 99, 235, 0.3);
+      color: #e2e8f0;
+    }
+    .chat-msg.user {
+      align-self: flex-end;
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #fff;
+    }
+
+    /* Blind Talent Pool */
+    .talent-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+    .talent-table th {
+      text-align: right;
+      padding: 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .talent-table td {
+      padding: 16px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .score-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 13px;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--primary);
+    }
+
+    /* Regional Expansion Map */
+    .expansion-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-top: 30px;
+    }
+    .expansion-card {
+      padding: 24px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      position: relative;
+    }
+
+    /* Pitch Modal */
+    .pitch-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 7, 13, 0.94);
+      backdrop-filter: blur(28px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .pitch-modal.active {
+      display: flex;
+    }
+    .pitch-dialog {
+      background: #0d1525;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      max-width: 920px;
+      width: 100%;
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      position: relative;
+      box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.9), 0 0 40px rgba(245, 158, 11, 0.15);
+    }
+    .close-modal-btn {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .close-modal-btn:hover {
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .pitch-slide {
+      display: none;
+    }
+    .pitch-slide.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+
+    /* Footer */
+    footer.shark-footer {
+      border-top: 1px solid var(--border);
+      padding: 50px 0 30px;
+      background: #060910;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .pillars-grid { grid-template-columns: 1fr; }
+      .roi-grid { grid-template-columns: 1fr; }
+      .ai-workforce-grid { grid-template-columns: 1fr 1fr; }
+      .human-experts-grid { grid-template-columns: 1fr; }
+      .expansion-grid { grid-template-columns: 1fr 1fr; }
+      .hero-metrics-strip { grid-template-columns: 1fr 1fr; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+
+  <!-- NAVIGATION -->
+  <header class="shark-nav">
+    <div class="brand-box" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+      <div class="brand-logo-badge">W</div>
+      <div>
+        <div class="brand-name">
+          واسطتك <span style="font-size: 13px; font-weight: 500; color: var(--primary);">| WASTATAK</span>
+        </div>
+        <div class="brand-tagline-micro">كفاءتك هي واسطتك الحقيقية</div>
+      </div>
+    </div>
+
+    <ul class="nav-links">
+      <li><button class="nav-link-btn active" onclick="scrollToSection('hero')">الرئيسية</button></li>
+      <li><button class="nav-link-btn" onclick="scrollToSection('pillars')">الركائز الأربع</button></li>
+      <li><button class="nav-link-btn" onclick="scrollToSection('roi')">حاسبة الوفر (ROI)</button></li>
+      <li><button class="nav-link-btn" onclick="scrollToSection('experts')">الخبراء البشريون</button></li>
+      <li><button class="nav-link-btn" onclick="scrollToSection('simulations')">محاكاة الـ 90 يوم</button></li>
+      <li><button class="nav-link-btn" onclick="scrollToSection('workforce')">موظفو الـ AI</button></li>
+      <li><button class="nav-link-btn" onclick="scrollToSection('talent')">الفحص النزيه</button></li>
+    </ul>
+
+    <div class="nav-actions">
+      <!-- Book Consultation Button -->
+      <button class="btn btn-consult" id="open-consult-btn">
+        <i data-lucide="calendar"></i> حجز استشارة
+      </button>
+
+      <!-- Shark Tank Executive Pitch Button -->
+      <button class="btn btn-shark-pitch" id="open-pitch-deck-btn">
+        <i data-lucide="award"></i> عرض المستثمرين
+      </button>
+
+      <!-- Language Switcher -->
+      <button class="btn btn-outline" id="toggle-lang-btn" style="padding: 8px 14px; font-size: 13px;">
+        <i data-lucide="globe"></i> English
+      </button>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="hero-section" id="hero">
+    <div class="container">
+      <div class="hero-grid">
+        
+        <!-- Text Column -->
+        <div>
+          <div class="hero-badge-pill">
+            <i data-lucide="sparkles" style="width: 14px; height: 14px;"></i>
+            الجيل الجديد من التوظيف القائم على الأدلة والمستشارين
+          </div>
+
+          <h1 class="hero-title">
+            كفاءتك هي <br>
+            <span class="highlight-green">واسطتك الحقيقية.</span>
+          </h1>
+
+          <p class="hero-subtitle">
+            نستبدل السير الذاتية والاختبارات النظرية بـ <strong>مشروعات واقعية تحاكي أول 90 يوماً في الوظيفة</strong>، وتقارير أدلة ذكية مدعومة بالذكاء الاصطناعي وجلسات استشارية مع خبراء بشريين معتمدين.
+          </p>
+
+          <div class="hero-cta-group">
+            <button onclick="scrollToSection('simulations')" class="btn btn-primary" style="padding: 14px 28px; font-size: 16px;">
+              <i data-lucide="play-circle"></i> ابدأ محاكاة عملية الآن
+            </button>
+            <button onclick="openConsultationModal()" class="btn btn-consult" style="padding: 14px 24px; font-size: 16px;">
+              <i data-lucide="calendar-check"></i> احجز جلسة استشارة مع خبير
+            </button>
+          </div>
+
+          <!-- Trust Numbers Strip -->
+          <div class="hero-metrics-strip">
+            <div class="metric-item">
+              <div class="val">85<span class="unit">%</span></div>
+              <div class="lbl">تخفيض زمن التوظيف والفرز</div>
+            </div>
+            <div class="metric-item">
+              <div class="val">0<span class="unit">%</span></div>
+              <div class="lbl">سير ذاتية ومؤهلات وهمية</div>
+            </div>
+            <div class="metric-item">
+              <div class="val">94<span class="unit">%</span></div>
+              <div class="lbl">دقة التعيين بالأداء الفعلي</div>
+            </div>
+            <div class="metric-item">
+              <div class="val">100<span class="unit">%</span></div>
+              <div class="lbl">تقييم مبني على أدلة ملموسة</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3D Spatial Emblem Column -->
+        <div>
+          <div class="hero-3d-stage">
+            <canvas id="hero-canvas"></canvas>
+            
+            <div class="stage-hud-overlay">
+              <div class="stage-tag">
+                <span class="dot"></span>
+                <span>وسام إثبات الكفاءة الرقمي 3D</span>
+              </div>
+              <div class="stage-tag" style="font-family: var(--font-mono); font-size: 11px;">
+                SHARK TANK // 60 FPS
+              </div>
+            </div>
+          </div>
+          <div style="text-align: center; margin-top: 10px; font-size: 12px; color: var(--text-muted);">
+            <i data-lucide="move" style="width: 12px; height: 12px; vertical-align: middle;"></i> اسحب بالماوس لتدوير وسام الكفاءة واستكشاف انعكاسات الاستوديو
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 PILLARS SECTION -->
+  <section class="content-section" id="pillars">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-tag">المنظومة الرباعية المتكاملة</span>
+        <h2 class="section-title">ما الذي يجعل "واسطتك" فريدة وغير مسبوقة؟</h2>
+        <p class="section-desc">المنافسون يقدمون أجزاء منفصلة (مواقع سير ذاتية أو اختبارات نظرية). قوتنا في حلقة الأدلة المغلقة.</p>
+      </div>
+
+      <div class="pillars-grid">
+        <!-- Pillar 1 -->
+        <div class="card pillar-card">
+          <div class="pillar-icon-box"><i data-lucide="file-check"></i></div>
+          <span style="font-size: 11px; font-weight: 700; color: var(--primary); margin-bottom: 4px;">الركيزة الأولى</span>
+          <h3>الملف المهني الرقمي القابل لإعادة الاستخدام</h3>
+          <p>يملك المرشح ملفه الموثق ويشاركه برابط مشفر. لا مزيد من ملء نفس السيرة الذاتية وإعادة الاختبارات من الصفر لكل شركة.</p>
+          <ul class="pillar-points">
+            <li><i data-lucide="check"></i> أدلة ملموسة وكود قابل للتحقق</li>
+            <li><i data-lucide="check"></i> تحكم كامل في خصوصية الاطلاع</li>
+            <li><i data-lucide="check"></i> تحديث مستمر مع كل محاكاة</li>
+          </ul>
+        </div>
+
+        <!-- Pillar 2 -->
+        <div class="card pillar-card">
+          <div class="pillar-icon-box" style="color: #60a5fa; background: rgba(37,99,235,0.1); border-color: rgba(37,99,235,0.2);"><i data-lucide="terminal"></i></div>
+          <span style="font-size: 11px; font-weight: 700; color: #60a5fa; margin-bottom: 4px;">الركيزة الثانية</span>
+          <h3>إثبات القدرة العملية عبر محاكاة الوظائف</h3>
+          <p>مشروعات واقعية تحاكي أول 90 يوماً في الوظيفة، مصممة حسب المستوى (Junior إلى Lead) والتخصص التقني بدقة.</p>
+          <ul class="pillar-points">
+            <li><i data-lucide="check"></i> سيناريوهات تحاكي ضغط العمل الفعلي</li>
+            <li><i data-lucide="check"></i> مسموح استخدام الـ AI مع قياس نقد المرشح</li>
+            <li><i data-lucide="check"></i> تقييم طريقة التفكير والمنهجية</li>
+          </ul>
+        </div>
+
+        <!-- Pillar 3 -->
+        <div class="card pillar-card">
+          <div class="pillar-icon-box" style="color: #a855f7; background: rgba(168,85,247,0.1); border-color: rgba(168,85,247,0.2);"><i data-lucide="search-check"></i></div>
+          <span style="font-size: 11px; font-weight: 700; color: #a855f7; margin-bottom: 4px;">الركيزة الثالثة</span>
+          <h3>التحليل والتقييم بالذكاء الاصطناعي متعدد الأبعاد</h3>
+          <p>لا نمنح مجرد رقم عشوائي؛ بل نقدم تقريراً تحليلياً شاملاً مدعوماً باقتباسات وأدلة تشرح نقاط القوة ومجالات النمو.</p>
+          <ul class="pillar-points">
+            <li><i data-lucide="check"></i> قياس السلوك المهني ومعالجة الأخطاء</li>
+            <li><i data-lucide="check"></i> رصد تمييز المرشح لهلوسة الـ AI</li>
+            <li><i data-lucide="check"></i> حق تقديم استئناف واعتراض بشفافية</li>
+          </ul>
+        </div>
+
+        <!-- Pillar 4 -->
+        <div class="card pillar-card">
+          <div class="pillar-icon-box" style="color: #f59e0b; background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.2);"><i data-lucide="trending-up"></i></div>
+          <span style="font-size: 11px; font-weight: 700; color: #f59e0b; margin-bottom: 4px;">الركيزة الرابعة</span>
+          <h3>حلقة المعايرة والتحسين المستمر بعد التعيين</h3>
+          <p>نربط التقييم المبدئي بالأداء الفعلي بعد 90 يوماً من التعيين، مما يجعل خوارزميات واسطتك أكثر دقة يوماً بعد يوم.</p>
+          <ul class="pillar-points">
+            <li><i data-lucide="check"></i> كفاءات جاهزة للتعيين الفوري</li>
+            <li><i data-lucide="check"></i> مقارنة بالأدلة بدل الانطباع الشخصي</li>
+            <li><i data-lucide="check"></i> معايرة تراعي ظروف وبيئة كل شركة</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- UPDATED ROI CALCULATOR (Cleaned per user instruction) -->
+  <section class="content-section" id="roi" style="background: rgba(11, 17, 28, 0.5);">
+    <div class="container">
+      <div class="roi-container">
+        <div class="roi-grid">
+          
+          <div>
+            <div class="hero-badge-pill" style="margin-bottom: 12px; background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3); color: var(--accent);">
+              <i data-lucide="coins"></i> حاسبة التكلفة والوفر لفريقك
+            </div>
+            <h2 class="section-title" style="font-size: 32px; text-align: right;">كم تستنزف المقابلات التقليدية من ميزانية شركتك؟</h2>
+            <p class="section-desc" style="text-align: right; margin-bottom: 24px;">
+              التوظيف التقليدي يكلف الشركة في المتوسط <strong>3,500 دولار</strong> لكل موظف، مع إهدار 22 يوماً في تصفية مئات السير الذاتية والمقابلات غير المثمرة:
+            </p>
+
+            <div class="roi-slider-group">
+              <div class="roi-slider-header">
+                <label>عدد التعيينات المستهدفة سنوياً:</label>
+                <span class="roi-slider-val" id="hires-count-val">12 موظف</span>
+              </div>
+              <input type="range" min="2" max="60" value="12" class="roi-range-input" id="roi-slider">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px;">
+              <div class="roi-stat-box">
+                <div class="lbl">تكلفة التوظيف التقليدي المهدرة:</div>
+                <div class="amt" id="traditional-cost-amt" style="color: #ef4444;">$42,000</div>
+              </div>
+              <div class="roi-stat-box">
+                <div class="lbl">أيام العمل المهدورة في المقابلات:</div>
+                <div class="amt" id="days-saved-val" style="color: var(--accent);">264 يوم</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Savings Potential Card -->
+          <div>
+            <div class="roi-highlight-card">
+              <span style="font-size: 13px; color: var(--primary); font-weight: 700; text-transform: uppercase;">الوفر المتوقع مع واسطتك</span>
+              <div style="font-size: clamp(32px, 3.8vw, 48px); font-weight: 900; color: #fff; margin: 10px 0;">
+                وفر يتجاوز <span style="color: var(--primary);">70%</span> من الميزانية
+              </div>
+              <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px;">
+                احمِ ميزانية شركتك من التعيينات الخاطئة التي تكلف 30% من الراتب السنوي. منصة واسطتك توفر خطط تسعير مرنة تناسب حجم كل شركة ومرحلتها.
+              </p>
+              <button onclick="openConsultationModal()" class="btn btn-consult" style="width: 100%; padding: 14px; font-size: 15px;">
+                <i data-lucide="calendar"></i> احجز جلسة لمعايرة متطلبات شركتك
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REAL HUMAN EMPLOYEES & CONSULTATION (New Section Requested!) -->
+  <section class="content-section" id="experts">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-tag">فريق الخبراء البشريين</span>
+        <h2 class="section-title">مستشارون وخبراء حقيقيون بجانب الذكاء الاصطناعي</h2>
+        <p class="section-desc">لا نعتمد على الذكاء الاصطناعي وحده؛ بل يرافقه نخبة من كبار الخبراء والمقيمين البشريين لمراجعة الحالات المعقدة وتقديم استشارات توظيف وتطوير مهني متخصصة.</p>
+      </div>
+
+      <div class="human-experts-grid">
+        <!-- Expert 1 -->
+        <div class="card expert-card">
+          <div class="expert-photo">👨‍💼</div>
+          <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">م. طارق العوضي</h3>
+          <span style="font-size: 13px; color: #60a5fa; font-weight: 700; display: block; margin-bottom: 12px;">كبير مهندسي المعمارية السحابية والتقييم البشري</span>
+          <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6;">
+            خبرة 15+ عاماً في كبرى بنوك وشركات الخليج ومصر. يراجع المخرجات المعمارية المعقدة والحلول غير التقليدية للمرشحين.
+          </p>
+          <button onclick="openConsultationModal('م. طارق العوضي - استشارة تقنية')" class="btn btn-outline" style="width: 100%; font-size: 13px;">
+            <i data-lucide="calendar"></i> حجز استشارة تقنية
+          </button>
+        </div>
+
+        <!-- Expert 2 -->
+        <div class="card expert-card">
+          <div class="expert-photo" style="background: linear-gradient(135deg, #a855f7, #ec4899);">👩‍💼</div>
+          <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">أ. مريم السعيد</h3>
+          <span style="font-size: 13px; color: #c084fc; font-weight: 700; display: block; margin-bottom: 12px;">استشارية الموارد البشرية والتوظيف التنفيذي</span>
+          <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6;">
+            متخصصة في بناء وتأهيل فرق العمل للشركات الناشئة والمؤسسات، وتحليل التوافق الثقافي والسلوكي مع قيادات الشركات.
+          </p>
+          <button onclick="openConsultationModal('أ. مريم السعيد - استشارة توظيف')" class="btn btn-outline" style="width: 100%; font-size: 13px;">
+            <i data-lucide="calendar"></i> حجز استشارة للشركات
+          </button>
+        </div>
+
+        <!-- Expert 3 -->
+        <div class="card expert-card">
+          <div class="expert-photo" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">👨‍🏫</div>
+          <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 4px;">كابتن ياسين منصور</h3>
+          <span style="font-size: 13px; color: #fbbf24; font-weight: 700; display: block; margin-bottom: 12px;">موجه القيادات التقنية والمسار المهني</span>
+          <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6;">
+            يقدم جلسات إرشاد مهني 1-on-1 لتجهيز الكفاءات العليا للمنافسة على عقود العمل الإقليمية والعالمية برواتب تنافسية.
+          </p>
+          <button onclick="openConsultationModal('كابتن ياسين منصور - توجيه مهني')" class="btn btn-outline" style="width: 100%; font-size: 13px;">
+            <i data-lucide="calendar"></i> حجز جلسة توجيه مهني
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SIMULATIONS CATALOG -->
+  <section class="content-section" id="simulations">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-tag">كتالوج المشروعات الواقعية</span>
+        <h2 class="section-title">مشروعات تحاكي أول 90 يوماً في الوظيفة</h2>
+        <p class="section-desc">لا اختبارات أكاديمية على سبورة بيضاء؛ بل تحديات إنتاجية تحاكي بيئة العمل الفعلية.</p>
+      </div>
+
+      <div class="simulations-grid">
+        <!-- Sim 1 -->
+        <div class="card sim-card">
+          <div class="sim-badge-row">
+            <span class="sim-track-badge">هندسة البرمجيات</span>
+            <span class="sim-time-badge"><i data-lucide="clock" style="width: 13px; height: 13px;"></i> 90 دقيقة // Senior</span>
+          </div>
+          <h3 style="font-size: 18px; margin-bottom: 8px;">بوابة مدفوعات فائقة التحمل وتسوية الإشعارات</h3>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+            تصميم وتنفيذ نقطة نهاية معالجة مدفوعات ذات خاصية تكرار آمن (Idempotent) تتعامل مع تكرار الإشعارات وانقطاع الشبكة أثناء ضغط مبيعات الذروة.
+          </p>
+          <div style="font-size: 12px; color: var(--primary); font-weight: 700; margin-top: auto;">
+            المخرجات: آلية قفل السحب المزدوج + معالجة الارتداد الموزع
+          </div>
+        </div>
+
+        <!-- Sim 2 -->
+        <div class="card sim-card">
+          <div class="sim-badge-row">
+            <span class="sim-track-badge" style="color: #a855f7; background: rgba(168,85,247,0.15); border-color: rgba(168,85,247,0.3);">علوم وتحليل البيانات</span>
+            <span class="sim-time-badge"><i data-lucide="clock" style="width: 13px; height: 13px;"></i> 75 دقيقة // Mid</span>
+          </div>
+          <h3 style="font-size: 18px; margin-bottom: 8px;">تحليل أسباب تسرب العملاء وبناء لوحة قيادة تنبؤية</h3>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+            تحليل بيانات سلوك 45,000 مستخدم في منصة SaaS لاكتشاف الأسباب الخفية لمغادرة العملاء وتقديم استراتيجية احتفاظ مثبتة بالنمذجة الإحصائية.
+          </p>
+          <div style="font-size: 12px; color: var(--primary); font-weight: 700; margin-top: auto;">
+            المخرجات: تحليل الفئات الزمنية (Cohort) + تقرير تنفيذي للقيادة
+          </div>
+        </div>
+
+        <!-- Sim 3 -->
+        <div class="card sim-card">
+          <div class="sim-badge-row">
+            <span class="sim-track-badge" style="color: #10b981; background: rgba(168,85,247,0.15); border-color: rgba(16,185,129,0.3);">تصميم الواجهات UI/UX</span>
+            <span class="sim-time-badge"><i data-lucide="clock" style="width: 13px; height: 13px;"></i> 60 دقيقة // Senior</span>
+          </div>
+          <h3 style="font-size: 18px; margin-bottom: 8px;">تصميم تطبيق مصرفي شامل لأصحاب المشروعات الصغيرة</h3>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+            تصميم مسار تسجيل وطلب تمويل فوري يتميز بالثقة وسهولة الاستخدام مع مراعاة المعايير العربية (RTL) وإمكانية الوصول لذوي الاحتياجات (WCAG AAA).
+          </p>
+          <div style="font-size: 12px; color: var(--primary); font-weight: 700; margin-top: auto;">
+            المخرجات: مسار تحقق KYC انسيابي + رموز تصميم Design Tokens
+          </div>
+        </div>
+
+        <!-- Sim 4 -->
+        <div class="card sim-card">
+          <div class="sim-badge-row">
+            <span class="sim-track-badge" style="color: #ef4444; background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3);">الأمن السيبراني</span>
+            <span class="sim-time-badge"><i data-lucide="clock" style="width: 13px; height: 13px;"></i> 80 دقيقة // Senior</span>
+          </div>
+          <h3 style="font-size: 18px; margin-bottom: 8px;">التحقيق في اختراق سحابي ومعالجة الثغرات الفورية</h3>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+            تحليل سجلات أمنية لحركة مريبة داخل AWS، عزل الخوادم المتأثرة، وتحديث سياسات الصلاحيات (IAM) لسد ثغرة Zero-Day بدون توقف الخدمة.
+          </p>
+          <div style="font-size: 12px; color: var(--primary); font-weight: 700; margin-top: auto;">
+            المخرجات: مسار الهجوم الجنائي + سياسة الصلاحيات المقفلة
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI WORKFORCE WITH INTERACTIVE CHAT -->
+  <section class="content-section" id="workforce" style="background: rgba(11, 17, 28, 0.5);">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-tag">الكوادر الاصطناعية</span>
+        <h2 class="section-title">فريق موظفي الذكاء الاصطناعي التفاعلي</h2>
+        <p class="section-desc">اضغط على أي موظف ذكاء اصطناعي وتحدث معه مباشرة لتجربة أسلوب التقييم والمحاكاة.</p>
+      </div>
+
+      <div class="ai-workforce-grid">
+        <div class="card ai-agent-card active" onclick="selectAiAgent('sara')">
+          <div class="agent-avatar">👩‍💼</div>
+          <h3 style="font-size: 18px; margin-bottom: 4px;">سارة</h3>
+          <span style="font-size: 12px; color: var(--primary); font-weight: 700; display: block; margin-bottom: 6px;">خبيرة توظيف الشركات</span>
+          <p style="font-size: 12px; color: var(--text-muted);">تصميم معايير الفحص السلوكي</p>
+        </div>
+
+        <div class="card ai-agent-card" onclick="selectAiAgent('karim')">
+          <div class="agent-avatar" style="border-color: #60a5fa;">👨‍💻</div>
+          <h3 style="font-size: 18px; margin-bottom: 4px;">كريم</h3>
+          <span style="font-size: 12px; color: #60a5fa; font-weight: 700; display: block; margin-bottom: 6px;">المقيّم التقني ومحلل الأدلة</span>
+          <p style="font-size: 12px; color: var(--text-muted);">تدقيق جودة الكود والـ Big-O</p>
+        </div>
+
+        <div class="card ai-agent-card" onclick="selectAiAgent('nour')">
+          <div class="agent-avatar" style="border-color: #a855f7;">🧭</div>
+          <h3 style="font-size: 18px; margin-bottom: 4px;">نور</h3>
+          <span style="font-size: 12px; color: #a855f7; font-weight: 700; display: block; margin-bottom: 6px;">المرشدة المهنية</span>
+          <p style="font-size: 12px; color: var(--text-muted);">تحليل فرص الخليج والعالم</p>
+        </div>
+
+        <div class="card ai-agent-card" onclick="selectAiAgent('fahad')">
+          <div class="agent-avatar" style="border-color: var(--accent);">🎯</div>
+          <h3 style="font-size: 18px; margin-bottom: 4px;">فهد</h3>
+          <span style="font-size: 12px; color: var(--accent); font-weight: 700; display: block; margin-bottom: 6px;">محاكي الأزمات والسلوك</span>
+          <p style="font-size: 12px; color: var(--text-muted);">اختبار طريقة التفكير تحت الضغط</p>
+        </div>
+      </div>
+
+      <!-- Live Chat Simulator Box -->
+      <div class="chat-box-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 14px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div id="chat-agent-avatar" style="font-size: 22px;">👩‍💼</div>
+            <div>
+              <strong id="chat-agent-name" style="font-size: 15px;">سارة — خبيرة توظيف الشركات</strong>
+              <div style="font-size: 11px; color: var(--primary);">متصل الآن // جاهزة للإجابة</div>
+            </div>
+          </div>
+          <span style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">AI LIVE SIMULATION</span>
+        </div>
+
+        <div class="chat-messages" id="chat-messages-container">
+          <div class="chat-msg agent">
+            أهلاً بك! أنا سارة، أخصائية التوظيف في واسطتك. بناءً على معايير السوق الحالية، يمكننا تصميم اختبار عملي لشركتكم يركز على معالجة ضغط العمل وكيفية تدقيق مخرجات الـ AI. ما التخصص الذي ترغب في فحصه اليوم؟
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <input type="text" id="chat-user-input" placeholder="اكتب سؤالك أو استفسارك هنا..." style="flex: 1; background: #0b1120; border: 1px solid var(--border); padding: 12px 16px; border-radius: var(--radius-sm); color: #fff; font-family: var(--font-ar); outline: none;">
+          <button onclick="sendChatMessage()" class="btn btn-primary" style="padding: 12px 20px;">
+            <i data-lucide="send"></i> إرسال
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BLIND SCREENING TALENT POOL -->
+  <section class="content-section" id="talent">
+    <div class="container">
+      <div class="section-head">
+        <span class="section-tag">توظيف بنزاهة مطلقة</span>
+        <h2 class="section-title">بنك الكفاءات الأعمى (Blind Screening)</h2>
+        <p class="section-desc">إخفاء الأسماء والصور والخلفيات للتركيز 100% على الأدلة الفعلية وكود الإنجاز.</p>
+      </div>
+
+      <div class="card" style="padding: 32px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 14px;">
+          <div>
+            <h3 style="font-size: 20px;">قائمة المرشحين المعتمدين بالأدلة</h3>
+            <p style="font-size: 13px; color: var(--text-muted);">تم فحصهم عبر مشروعات 90 يوماً محاكاة مع توثيق الأداء الفعلي.</p>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 13px; font-weight: 700;">وضع الفحص النزيه (إخفاء الهوية):</span>
+            <input type="checkbox" id="blind-toggle" checked style="width: 20px; height: 20px; accent-color: var(--primary); cursor: pointer;">
+          </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="talent-table">
+            <thead>
+              <tr>
+                <th>المرشح</th>
+                <th>التخصص والمستوى</th>
+                <th>المحاكاة المنجزة</th>
+                <th>درجة الكفاءة</th>
+                <th>الأدلة الملموسة</th>
+                <th>الإجراء</th>
+              </tr>
+            </thead>
+            <tbody id="talent-tbody">
+              <tr>
+                <td><strong class="candidate-name">المرشح #W-892</strong></td>
+                <td>Senior Backend Engineer</td>
+                <td>بوابة مدفوعات فائقة التحمل</td>
+                <td><span class="score-badge">98.4%</span></td>
+                <td>Idempotency Lock + 100% Test Coverage</td>
+                <td><button onclick="openConsultationModal('طلب مقابلة المرشح #W-892')" class="btn btn-outline" style="padding: 6px 14px; font-size: 12px;">طلب مقابلة</button></td>
+              </tr>
+              <tr>
+                <td><strong class="candidate-name">المرشح #W-641</strong></td>
+                <td>Mid Data Scientist</td>
+                <td>تحليل تسرب عملاء SaaS</td>
+                <td><span class="score-badge">95.1%</span></td>
+                <td>Cohort Model + Executive Presentation</td>
+                <td><button onclick="openConsultationModal('طلب مقابلة المرشح #W-641')" class="btn btn-outline" style="padding: 6px 14px; font-size: 12px;">طلب مقابلة</button></td>
+              </tr>
+              <tr>
+                <td><strong class="candidate-name">المرشح #W-512</strong></td>
+                <td>Senior Product Designer</td>
+                <td>تطبيق مصرفي شامل RTL</td>
+                <td><span class="score-badge">96.8%</span></td>
+                <td>Figma System + WCAG AAA Contrast</td>
+                <td><button onclick="openConsultationModal('طلب مقابلة المرشح #W-512')" class="btn btn-outline" style="padding: 6px 14px; font-size: 12px;">طلب مقابلة</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REGIONAL EXPANSION ROADMAP (Restored from Original) -->
+  <section class="content-section" style="background: rgba(11, 17, 28, 0.5);">
+    <div class="container text-center">
+      <div class="section-head">
+        <span class="section-tag">خارطة التوسع الإقليمي</span>
+        <h2 class="section-title">من مصر إلى الخليج ثم العالمية</h2>
+        <p class="section-desc">مصر تمثل أعلى كثافة من المواهب التقنية، ودول الخليج تمثل أكبر طلب استثماري على الكفاءات الموثوقة.</p>
+      </div>
+
+      <div class="expansion-grid">
+        <div class="expansion-card" style="border-color: rgba(16,185,129,0.5);">
+          <span style="font-size: 10px; font-weight: 800; background: var(--primary); color: #000; padding: 2px 8px; border-radius: 99px; position: absolute; top: -10px; right: 14px;">المرحلة 1: الانطلاق</span>
+          <div style="font-size: 32px; margin-bottom: 8px;">🇪🇬</div>
+          <h3 style="font-size: 18px; margin-bottom: 4px;">مصر</h3>
+          <p style="font-size: 12px; color: var(--text-muted);">بناء أكبر بنك كفاءات موثوقة في هندسة البرمجيات والبيانات والتصميم.</p>
+        </div>
+
+        <div class="expansion-card">
+          <span style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 4px;">المرحلة 2</span>
+          <div style="font-size: 32px; margin-bottom: 8px;">🇸🇦 🇦🇪</div>
+          <h3 style="font-size: 18px; margin-bottom: 4px;">الخليج العربي</h3>
+          <p style="font-size: 12px; color: var(--text-muted);">شراكات مع الشركات التقنية وصناديق الاستثمار لتسليم الكفاءات مباشرة.</p>
+        </div>
+
+        <div class="expansion-card">
+          <span style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 4px;">المرحلة 3</span>
+          <div style="font-size: 32px; margin-bottom: 8px;">🌍</div>
+          <h3 style="font-size: 18px; margin-bottom: 4px;">الشرق الأوسط</h3>
+          <p style="font-size: 12px; color: var(--text-muted);">توسيع نطاق المشروعات لتشمل كافة التخصصات الرقمية والمالية والتسويقية.</p>
+        </div>
+
+        <div class="expansion-card">
+          <span style="font-size: 10px; color: var(--text-muted); display: block; margin-bottom: 4px;">المرحلة 4</span>
+          <div style="font-size: 32px; margin-bottom: 8px;">🌐</div>
+          <h3 style="font-size: 18px; margin-bottom: 4px;">الأسواق العالمية</h3>
+          <p style="font-size: 12px; color: var(--text-muted);">ربط كفاءات منطقتنا بالشركات العالمية الباحثة عن مواهب مثبتة عن بعد.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONSULTATION BOOKING MODAL -->
+  <div class="consult-modal" id="consult-modal">
+    <div class="consult-dialog">
+      <button class="close-modal-btn" onclick="closeConsultationModal()"><i data-lucide="x"></i></button>
+
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+        <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(37,99,235,0.2); display: flex; align-items: center; justify-content: center; color: #60a5fa;">
+          <i data-lucide="calendar-check"></i>
+        </div>
+        <div>
+          <h3 style="font-size: 22px; font-weight: 800;">حجز جلسة استشارة مع خبير</h3>
+          <p style="font-size: 12px; color: var(--text-muted);">مع مستشاري منصة واسطتك المعتمدين</p>
+        </div>
+      </div>
+
+      <form id="consult-form" onsubmit="handleConsultSubmit(event)">
+        <div class="form-control">
+          <label>نوع الاستشارة المطلوبة:</label>
+          <select id="consult-topic">
+            <option value="enterprise">استشارة للشركات (معايرة التوظيف واحتساب الوفر)</option>
+            <option value="candidate">استشارة مهنية للمرشحين (تقييم المحاكاة والمسار الوظيفي)</option>
+            <option value="architecture">استشارة تقنية وهندسية (مراجعة معمارية الأنظمة)</option>
+            <option value="partnership">شراكة استثمارية أو أكاديمية</option>
+          </select>
+        </div>
+
+        <div class="form-control">
+          <label>الاسم الكامل أو اسم الشركة:</label>
+          <input type="text" id="consult-name" required placeholder="مثال: م. عمر أو شركة تكنو كلاود">
+        </div>
+
+        <div class="form-control">
+          <label>البريد الإلكتروني أو رقم الهاتف / واتساب:</label>
+          <input type="text" id="consult-contact" required placeholder="example@company.com أو +20 10...">
+        </div>
+
+        <div class="form-control">
+          <label>ملاحظات إضافية أو تفاصيل التعيين:</label>
+          <textarea id="consult-notes" rows="3" placeholder="اكتب نبذة عن احتياجك أو الوظائف المستهدفة..."></textarea>
+        </div>
+
+        <div id="consult-success-msg" style="display: none; background: rgba(16,185,129,0.15); border: 1px solid var(--primary); padding: 12px; border-radius: var(--radius-sm); font-size: 13px; color: #34d399; margin-bottom: 14px; text-align: center;">
+          ✅ تم تسجيل طلب الاستشارة بنجاح! سيتواصل معك أحد خبرائنا خلال 24 ساعة.
+        </div>
+
+        <button type="submit" class="btn btn-consult" style="width: 100%; padding: 14px; font-size: 15px;">
+          <i data-lucide="check-circle"></i> تأكيد حجز الاستشارة
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- SHARK TANK EXECUTIVE PITCH MODAL -->
+  <div class="pitch-modal" id="pitch-modal">
+    <div class="pitch-dialog">
+      <button class="close-modal-btn" id="close-pitch-modal"><i data-lucide="x"></i></button>
+
+      <!-- Slide 1 -->
+      <div class="pitch-slide active" data-slide="1">
+        <div style="font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 8px;">SHARK TANK PITCH // المشكلة والحل</div>
+        <h2 style="font-size: 32px; font-weight: 900; margin-bottom: 16px;">أزمة التوظيف التي تكلف المنطقة مليارات</h2>
+        <p style="color: var(--text-muted); font-size: 16px; margin-bottom: 24px; line-height: 1.7;">
+          الشركات تنفق مليارات الدولارات سنوياً على مقابلات تقليدية تفشل في 40% من الحالات بعد 6 أشهر، بينما يعاني الشباب أصحاب المهارات الحقيقية من حواجز المحسوبية ("الواسطة") والسير الذاتية المزيفة. 
+          <br><br>
+          <strong>واسطتك تقلب المعادلة:</strong> كفاءتك الفعلية في محاكاة أول 90 يوماً من الوظيفة هي واسطتك الوحيدة للوصول لأكبر الشركات بدون وساطة أحد.
+        </p>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+          <div class="roi-stat-box"><div class="lbl">حجم السوق بالمنطقة (TAM)</div><div class="amt" style="color: var(--accent); font-size: 24px;">$38B</div></div>
+          <div class="roi-stat-box"><div class="lbl">نسبة الوفر المتوقع للشركات</div><div class="amt" style="color: var(--primary); font-size: 24px;">70%+</div></div>
+          <div class="roi-stat-box"><div class="lbl">زمن إتمام التعيين</div><div class="amt" style="color: #60a5fa; font-size: 24px;">48 ساعة</div></div>
+        </div>
+      </div>
+
+      <!-- Slide 2 -->
+      <div class="pitch-slide" data-slide="2">
+        <div style="font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 8px;">SHARK TANK PITCH // نموذج العمل والربحية (Business Model)</div>
+        <h2 style="font-size: 32px; font-weight: 900; margin-bottom: 16px;">كيف تحقق المنصة عوائد مالية متصاعدة؟</h2>
+        <p style="color: var(--text-muted); font-size: 16px; margin-bottom: 24px; line-height: 1.7;">
+          نعتمد على نموذج B2B SaaS هجين ذو هوامش ربحية تتجاوز 82%:
+        </p>
+        <ul style="list-style: none; margin-bottom: 24px; display: grid; gap: 12px;">
+          <li style="display: flex; gap: 10px; font-size: 15px;"><i data-lucide="check-circle" style="color: var(--primary);"></i> <strong>اشتراكات الشركات (SaaS Subscriptions):</strong> باقات سنوية مخصصة تتيح الوصول لبنك الكفاءات والمحاكاة المعتمدة.</li>
+          <li style="display: flex; gap: 10px; font-size: 15px;"><i data-lucide="check-circle" style="color: var(--primary);"></i> <strong>رسوم نجاح التعيين (Success Placement Fee):</strong> عمولة نجاح عادلة عند إتمام التعيين (أقل بـ 60% من مكاتب الـ Headhunting التقليدية).</li>
+          <li style="display: flex; gap: 10px; font-size: 15px;"><i data-lucide="check-circle" style="color: var(--primary);"></i> <strong>جلسات الاستشارات المتميزة:</strong> استشارات تقنية وسلوكية مع الخبراء البشريين للشركات والمرشحين.</li>
+        </ul>
+      </div>
+
+      <!-- Slide 3 -->
+      <div class="pitch-slide" data-slide="3">
+        <div style="font-size: 12px; font-weight: 700; color: var(--accent); margin-bottom: 8px;">SHARK TANK PITCH // طلب الاستثمار والشراكة</div>
+        <h2 style="font-size: 32px; font-weight: 900; margin-bottom: 16px;">فرصة الاستثمار معنا اليوم</h2>
+        <p style="color: var(--text-muted); font-size: 16px; margin-bottom: 24px; line-height: 1.7;">
+          نطلب استثماراً بقيمة <strong>350,000 دولار مقابل 10% حصة</strong> في منصة واسطتك لتسريع التوسع في الأسواق المصرية والسعودية، وربط 50,000 كفاءة عربية بأكثر من 400 شركة ناشئة ومؤسسة كبرى خلال 18 شهراً.
+        </p>
+        <div style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3); padding: 20px; border-radius: var(--radius-sm); text-align: center;">
+          <div style="font-size: 18px; font-weight: 800; color: var(--primary); margin-bottom: 6px;">جاهزون للإجابة عن أسئلتكم ومناقشة تفاصيل الصفقة!</div>
+          <div style="font-size: 13px; color: var(--text-muted);">فريق منصة واسطتك | WASTATAK Inc. © 2026</div>
+        </div>
+      </div>
+
+      <!-- Modal Navigation -->
+      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 20px; margin-top: 24px;">
+        <span style="font-size: 12px; color: var(--text-muted);" id="slide-num-lbl">شريحة 1 من 3</span>
+        <div style="display: flex; gap: 10px;">
+          <button class="btn btn-outline" id="prev-pitch-btn">السابق</button>
+          <button class="btn btn-shark-pitch" id="next-pitch-btn">التالي <i data-lucide="arrow-left"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="shark-footer">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px;">
+      <div>
+        <div style="font-weight: 800; font-size: 18px;">منصة واسطتك | WASTATAK</div>
+        <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">"كفاءتك هي واسطتك الحقيقية" — جميع الحقوق محفوظة © 2026.</div>
+      </div>
+      <div style="font-size: 12px; color: var(--primary); font-family: var(--font-mono);">
+        SHARK TANK EDITION // VERIFIED EVIDENCE
+      </div>
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT: THREE.JS 3D + CHAT + ROI LOGIC -->
+  <script>
+    lucide.createIcons();
+
+    function scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    /* ==========================================================
+       1. THREE.JS 3D LUXURY "PROOF OF COMPETENCE" EMBLEM
+       ========================================================== */
+    const canvas = document.getElementById('hero-canvas');
+    const container = canvas.parentElement;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+    camera.position.set(0, 0, 11);
+
+    const renderer = new THREE.WebGLRenderer({
+      canvas: canvas,
+      antialias: true,
+      alpha: true,
+      powerPreference: "high-performance"
+    });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.enableZoom = false;
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 1.0;
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+
+    const keyLight = new THREE.PointLight(0x10b981, 3.5, 30);
+    keyLight.position.set(5, 6, 6);
+    scene.add(keyLight);
+
+    const fillLight = new THREE.PointLight(0x2563eb, 2.5, 30);
+    fillLight.position.set(-6, -4, -4);
+    scene.add(fillLight);
+
+    const goldAccentLight = new THREE.PointLight(0xf59e0b, 2.0, 20);
+    goldAccentLight.position.set(0, -5, 5);
+    scene.add(goldAccentLight);
+
+    const masterEmblemGroup = new THREE.Group();
+    scene.add(masterEmblemGroup);
+
+    const prismGeo = new THREE.OctahedronGeometry(2.0, 0);
+    const prismMat = new THREE.MeshPhysicalMaterial({
+      color: 0x10b981,
+      emissive: 0x054f38,
+      emissiveIntensity: 0.4,
+      transmission: 0.6,
+      opacity: 0.9,
+      transparent: true,
+      roughness: 0.1,
+      metalness: 0.2,
+      reflectivity: 0.9,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.1
+    });
+    const prismMesh = new THREE.Mesh(prismGeo, prismMat);
+    masterEmblemGroup.add(prismMesh);
+
+    const heartGeo = new THREE.DodecahedronGeometry(0.9, 0);
+    const heartMat = new THREE.MeshStandardMaterial({
+      color: 0xf59e0b,
+      metalness: 0.85,
+      roughness: 0.2,
+      emissive: 0xd97706,
+      emissiveIntensity: 0.3
+    });
+    const heartMesh = new THREE.Mesh(heartGeo, heartMat);
+    masterEmblemGroup.add(heartMesh);
+
+    const ring1Geo = new THREE.TorusGeometry(3.0, 0.035, 16, 100);
+    const ring1Mat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.9, roughness: 0.1 });
+    const ring1 = new THREE.Mesh(ring1Geo, ring1Mat);
+    masterEmblemGroup.add(ring1);
+
+    const ring2Geo = new THREE.TorusGeometry(3.5, 0.025, 16, 100);
+    const ring2Mat = new THREE.MeshStandardMaterial({ color: 0x10b981, metalness: 0.8, roughness: 0.2 });
+    const ring2 = new THREE.Mesh(ring2Geo, ring2Mat);
+    ring2.rotation.x = Math.PI / 2.8;
+    masterEmblemGroup.add(ring2);
+
+    const particleCount = 500;
+    const particleGeo = new THREE.BufferGeometry();
+    const particlePos = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount; i++) {
+      const radius = 3.8 + Math.random() * 4.5;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos((Math.random() * 2) - 1);
+      particlePos[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+      particlePos[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+      particlePos[i * 3 + 2] = radius * Math.cos(phi);
+    }
+    particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePos, 3));
+    const particleMat = new THREE.PointsMaterial({ color: 0x34d399, size: 0.05, transparent: true, opacity: 0.6 });
+    const particles = new THREE.Points(particleGeo, particleMat);
+    scene.add(particles);
+
+    window.addEventListener('resize', () => {
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    });
+
+    let clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+      const elapsedTime = clock.getElapsedTime();
+      ring1.rotation.z += 0.005;
+      ring2.rotation.y += 0.007;
+      const scale = 1 + Math.sin(elapsedTime * 2) * 0.03;
+      heartMesh.scale.set(scale, scale, scale);
+      particles.rotation.y = elapsedTime * 0.03;
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    /* ==========================================================
+       2. UPDATED ROI CALCULATOR (Cleaned per user request)
+       ========================================================== */
+    const roiSlider = document.getElementById('roi-slider');
+    const hiresCountVal = document.getElementById('hires-count-val');
+    const traditionalCostAmt = document.getElementById('traditional-cost-amt');
+    const daysSavedVal = document.getElementById('days-saved-val');
+
+    function updateROI() {
+      const hires = parseInt(roiSlider.value);
+      hiresCountVal.innerText = `${hires} موظف`;
+
+      const traditional = hires * 3500;
+      const days = hires * 22;
+
+      traditionalCostAmt.innerText = `$${traditional.toLocaleString()}`;
+      daysSavedVal.innerText = `${days.toLocaleString()} يوم`;
+    }
+
+    roiSlider.addEventListener('input', updateROI);
+    updateROI();
+
+    /* ==========================================================
+       3. CONSULTATION MODAL LOGIC
+       ========================================================== */
+    const consultModal = document.getElementById('consult-modal');
+
+    function openConsultationModal(topic) {
+      if (topic) {
+        document.getElementById('consult-notes').value = `مطلوب: ${topic}`;
+      }
+      consultModal.classList.add('active');
+    }
+
+    function closeConsultationModal() {
+      consultModal.classList.remove('active');
+      document.getElementById('consult-success-msg').style.display = 'none';
+    }
+
+    document.getElementById('open-consult-btn').addEventListener('click', () => openConsultationModal());
+
+    function handleConsultSubmit(e) {
+      e.preventDefault();
+      document.getElementById('consult-success-msg').style.display = 'block';
+      setTimeout(() => {
+        closeConsultationModal();
+        document.getElementById('consult-form').reset();
+      }, 2500);
+    }
+
+    /* ==========================================================
+       4. AI WORKFORCE CHAT SIMULATOR
+       ========================================================== */
+    const agentData = {
+      sara: {
+        name: "سارة — خبيرة توظيف الشركات",
+        avatar: "👩‍💼",
+        initial: "أهلاً بك! أنا سارة، أخصائية التوظيف في واسطتك. يمكننا تصميم اختبار عملي لشركتكم يركز على معالجة ضغط العمل وكيفية تدقيق مخرجات الـ AI. ما التخصص الذي ترغب في فحصه اليوم؟",
+        responses: [
+          "بناءً على معايير السوق الحالية، أنصح بمشروع محاكاة 90 دقيقة يركز على تكرار البيانات اللحظية والتعامل مع الأخطاء.",
+          "يمكننا تجهيز لوحة فحص الشركات لتعيين أول 3 مرشحين خلال 48 ساعة فقط."
+        ]
+      },
+      karim: {
+        name: "كريم — المقيّم التقني ومحلل الأدلة",
+        avatar: "👨‍💻",
+        initial: "مرحباً! أنا كريم. مهمتي فحص الكود الحقيقي، كفاءة الخوارزميات (Big-O)، والتأكد من تطبيق مبادئ Clean Code دون الاعتماد الأعمى على مخرجات الذكاء الاصطناعي.",
+        responses: [
+          "في تقرير المحاكاة الأخير، رصدنا نجاح المرشح في معالجة انقطاع الاتصال بنسبة 98% مع تغطية اختبارات بنسبة 100%.",
+          "الكود النظيف ليس رفاهية؛ هو المعيار الذي يمنع انهيار السيرفرات في أوقات الذروة."
+        ]
+      },
+      nour: {
+        name: "نور — المرشدة المهنية",
+        avatar: "🧭",
+        initial: "أهلاً بك! أنا نور. أساعدك على توجيه مسارك المهني واختيار مشروعات المحاكاة التي تفتح لك فرص العمل برواتب الخليج والشركات العالمية.",
+        responses: [
+          "تحليل ملفك يظهر تميزك في Backend، وأوصيك بإكمال محاكاة 'الأمن السحابي' لفتح 4 فرص مباشرة في السعودية والإمارات.",
+          "الرواتب في السوق الإقليمي حالياً تتطلب إثبات القدرة العملية لا مجرد دورات تدريبية."
+        ]
+      },
+      fahad: {
+        name: "فهد — محاكي الأزمات والسلوك",
+        avatar: "🎯",
+        initial: "حياك الله! أنا فهد. أضع المرشحين في سيناريوهات واقعية تحاكي أعطال السيرفرات والمشاكل الإنتاجية لاختبار رد الفعل المهني تحت الضغط.",
+        responses: [
+          "[سيناريو مفاجئ]: السيرفر الرئيسي توقف أثناء إطلاق المنتج أمام 10,000 عميل! ما هي أول 3 خطوات ستتخذها فوراً؟",
+          "الهدوء والتفكير المنهجي هما ما يميز المهندس الخبير عن المبتدئ عند وقوع الحوادث."
+        ]
+      }
+    };
+
+    let currentAgent = 'sara';
+
+    function selectAiAgent(agentKey) {
+      currentAgent = agentKey;
+      const data = agentData[agentKey];
+
+      document.querySelectorAll('.ai-agent-card').forEach(card => card.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+
+      document.getElementById('chat-agent-name').innerText = data.name;
+      document.getElementById('chat-agent-avatar').innerText = data.avatar;
+
+      const container = document.getElementById('chat-messages-container');
+      container.innerHTML = `<div class="chat-msg agent">${data.initial}</div>`;
+    }
+
+    function sendChatMessage() {
+      const input = document.getElementById('chat-user-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const container = document.getElementById('chat-messages-container');
+      container.innerHTML += `<div class="chat-msg user">${text}</div>`;
+      input.value = '';
+      container.scrollTop = container.scrollHeight;
+
+      setTimeout(() => {
+        const responses = agentData[currentAgent].responses;
+        const reply = responses[Math.floor(Math.random() * responses.length)];
+        container.innerHTML += `<div class="chat-msg agent">${reply}</div>`;
+        container.scrollTop = container.scrollHeight;
+      }, 800);
+    }
+
+    document.getElementById('chat-user-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendChatMessage();
+    });
+
+    /* ==========================================================
+       5. BLIND SCREENING TOGGLE
+       ========================================================== */
+    const blindToggle = document.getElementById('blind-toggle');
+    const candidateNames = document.querySelectorAll('.candidate-name');
+
+    blindToggle.addEventListener('change', () => {
+      if (blindToggle.checked) {
+        candidateNames[0].innerText = "المرشح #W-892";
+        candidateNames[1].innerText = "المرشح #W-641";
+        candidateNames[2].innerText = "المرشح #W-512";
+      } else {
+        candidateNames[0].innerText = "م. أحمد الشريف (القاهرة)";
+        candidateNames[1].innerText = "سارة المنصوري (الرياض)";
+        candidateNames[2].innerText = "عمر خالد (دبي)";
+      }
+    });
+
+    /* ==========================================================
+       6. SHARK TANK PITCH DECK MODAL
+       ========================================================== */
+    const pitchModal = document.getElementById('pitch-modal');
+    document.getElementById('open-pitch-deck-btn').addEventListener('click', () => {
+      pitchModal.classList.add('active');
+    });
+    document.getElementById('close-pitch-modal').addEventListener('click', () => {
+      pitchModal.classList.remove('active');
+    });
+
+    let currentSlide = 1;
+    const totalSlides = 3;
+
+    function renderSlide() {
+      document.querySelectorAll('.pitch-slide').forEach(slide => {
+        slide.classList.remove('active');
+        if (parseInt(slide.getAttribute('data-slide')) === currentSlide) {
+          slide.classList.add('active');
+        }
+      });
+      document.getElementById('slide-num-lbl').innerText = `شريحة ${currentSlide} من ${totalSlides}`;
+    }
+
+    document.getElementById('next-pitch-btn').addEventListener('click', () => {
+      if (currentSlide < totalSlides) currentSlide++;
+      else currentSlide = 1;
+      renderSlide();
+    });
+
+    document.getElementById('prev-pitch-btn').addEventListener('click', () => {
+      if (currentSlide > 1) {
+        currentSlide--;
+        renderSlide();
+      }
+    });
+
+    /* ==========================================================
+       7. BILINGUAL SWITCHER (ARABIC / ENGLISH)
+       ========================================================== */
+    let isArabic = true;
+    const toggleLangBtn = document.getElementById('toggle-lang-btn');
+
+    toggleLangBtn.addEventListener('click', () => {
+      isArabic = !isArabic;
+      document.documentElement.dir = isArabic ? 'rtl' : 'ltr';
+      document.documentElement.lang = isArabic ? 'ar' : 'en';
+      document.body.style.fontFamily = isArabic ? 'var(--font-ar)' : 'var(--font-en)';
+
+      toggleLangBtn.innerHTML = isArabic ? '<i data-lucide="globe"></i> English' : '<i data-lucide="globe"></i> عربي';
+      lucide.createIcons();
+
+      if (!isArabic) {
+        document.querySelector('.hero-title').innerHTML = `Your Competence is <br><span class="highlight-green">Your True Connection.</span>`;
+        document.querySelector('.hero-subtitle').innerText = "We replace CVs and whiteboards with realistic 90-day job simulations, verified AI dossiers, and zero-bias blind recruitment.";
+        document.getElementById('hires-count-val').innerText = `${roiSlider.value} Hires`;
+      } else {
+        document.querySelector('.hero-title').innerHTML = `كفاءتك هي <br><span class="highlight-green">واسطتك الحقيقية.</span>`;
+        document.querySelector('.hero-subtitle').innerText = "نستبدل السير الذاتية والاختبارات النظرية بمشروعات واقعية تحاكي أول 90 يوماً في الوظيفة، وتقارير أدلة ذكية مدعومة بالذكاء الاصطناعي وجلسات استشارية مع خبراء بشريين معتمدين.";
+        updateROI();
+      }
+    });
+  </script>
+</body>
+</html>
